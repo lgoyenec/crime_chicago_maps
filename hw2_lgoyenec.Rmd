@@ -1,0 +1,10 @@
+---
+title:  "Homework 02"
+author: "94-880 R Shiny <hr><b> Laura Goyeneche </b>"
+date:   "10/3/2019"
+output:
+  html_document:
+     theme: cerulean
+     highlight: tango
+     code_folding: hide
+---
