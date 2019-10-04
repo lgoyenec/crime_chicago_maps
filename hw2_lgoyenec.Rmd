@@ -26,8 +26,8 @@ packages = c("dplyr","tidyr",                                  # data manipulati
 invisible(suppressMessages(lapply(packages, library, character.only = T)))
 
 # Define working directory
-csv_cd = "C:/Users/lgoye/OneDrive/Education/CarnegieMellonUniversity/PPMDACourses/94880_R_Shiny/hw2_lgoyenec/data_csv"
-shp_cd = "C:/Users/lgoye/OneDrive/Education/CarnegieMellonUniversity/PPMDACourses/94880_R_Shiny/hw2_lgoyenec/data_shp"
+csv_cd = "C:/Users/lgoye/OneDrive/documents/GitHub/hw02_lgoyenec/data_csv"
+shp_cd = "C:/Users/lgoye/OneDrive/documents/GitHub/hw02_lgoyenec/data_shp"
 
 # Import data
 crimes = read.csv(paste0(csv_cd, "/crimes_2018.csv"))
@@ -41,5 +41,8 @@ sh_bikes = readOGR(dsn = shp_cd,
                    layer = "bike_routes", 
                    verbose = F)
 ```
+
+
+
 
 
