@@ -193,5 +193,50 @@ leaflet() %>%
     position = "bottomright") 
 ```
 
+### Map 3
+#### Distance between police stations and kidnapping crimes
+```{r, messages = F, warnings = F}
+data_kidna =
+  crimes %>%
+  filter(primary.type == "ASSAULT", arrest == "true") %>%
+  select(latitude, longitude) 
+
+leaflet() %>%
+  
+  addProviderTiles(provider = "Esri.WorldGrayCanvas", group = "World Gray") %>%
+  addTiles(group = "OSM (default)") %>%
+  addProviderTiles("CartoDB.DarkMatterNoLabels"     , group = "World Dark") %>% 
+  addProviderTiles(provider = "Esri.WorldStreetMap" , group = "World StreetMap") %>%
+  addProviderTiles(provider = "Esri.WorldImagery"   , group = "World Imagery") %>%
+  
+  addPolygons(data = sh_bound, 
+              color = "white", weight = 1, 
+              fillColor = "#202030", fillOpacity = 0.6) %>%
+  
+  addPolylines(data = sh_bikes, 
+               color = "#F5BB00",
+               weight = 1.5,
+               group = "Bike Routes") %>%
+
+  addCircleMarkers(data = data_kidna,
+                   lng =~ longitude, lat =~ latitude,
+                   color = "#BA1200", fillOpacity = 1,
+                   radius = 0.2, stroke = F) %>%
+  
+  addCircleMarkers(data = police,
+                   lng =~ longitude, lat =~ latitude,
+                   color = "#2A4494", fillOpacity = 0.5,
+                   radius = 15, stroke = T, weight = 1.5,
+                   group = "Police Radius") %>%
+  
+  addLayersControl(
+    baseGroups = c("World Gray","OSM (default)","World Dark","World StreetMap","World Imagery"),
+    overlayGroups = c("Police Radius", "Bike Routes"),
+    options = layersControlOptions(collapsed = F),
+    position = "bottomright") %>%
+  
+  hideGroup("Bike Routes")
+
+```
 
 
