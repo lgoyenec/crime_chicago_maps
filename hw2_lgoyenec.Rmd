@@ -8,3 +8,38 @@ output:
      highlight: tango
      code_folding: hide
 ---
+
+```{r setup, include = F}
+knitr::opts_chunk$set(warning = F, message = F, fig.align = "center", fig.width = 9, fig.height = 8)
+```
+
+```{r}
+# Define packages
+packages = c("dplyr","tidyr",                                  # data manipulation
+             "rgdal","maptools",                               # shapefiles
+             "leaflet","leaflet.extras","leaflet.minicharts",  # maps
+             "RColorBrewer",                                   # colors palettes
+             "plyr",                                           # easy merge
+             "stringr")                                        # strings manipulation
+                                                     
+# Attach packages
+invisible(suppressMessages(lapply(packages, library, character.only = T)))
+
+# Define working directory
+csv_cd = "C:/Users/lgoye/OneDrive/Education/CarnegieMellonUniversity/PPMDACourses/94880_R_Shiny/hw2_lgoyenec/data_csv"
+shp_cd = "C:/Users/lgoye/OneDrive/Education/CarnegieMellonUniversity/PPMDACourses/94880_R_Shiny/hw2_lgoyenec/data_shp"
+
+# Import data
+crimes = read.csv(paste0(csv_cd, "/crimes_2018.csv"))
+police = read.csv(paste0(csv_cd, "/police_stations.csv"))
+  
+# Import shapefiles
+sh_bound = readOGR(dsn = shp_cd, 
+                   layer = "police_beats", 
+                   verbose = F)
+sh_bikes = readOGR(dsn = shp_cd, 
+                   layer = "bike_routes", 
+                   verbose = F)
+```
+
+
