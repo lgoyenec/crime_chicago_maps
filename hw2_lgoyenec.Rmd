@@ -42,6 +42,56 @@ sh_bikes = readOGR(dsn = shp_cd,
                    verbose = F)
 ```
 
+```{r}
+# All variables in lower case
+names(crimes) = tolower(names(crimes))
+names(police) = tolower(names(police))
+
+# Choosing variables of interest
+crimes = 
+  crimes %>% 
+  select(date, 
+         primary.type, 
+         location.description, 
+         arrest, domestic, 
+         beat, district, ward, community.area, 
+         x.coordinate, y.coordinate, latitude, longitude) 
+
+police = 
+  police %>%
+  select(`ï..district`, district.name, 
+         wards,
+         x.coordinate, y.coordinate, latitude, longitude) %>%
+  dplyr::rename(ward = wards) %>%
+  
+  # Changes on district variable for polylines map
+  dplyr::rename(district = `ï..district`) %>%
+  mutate(district = as.numeric(ifelse(district == "Headquarters", 0, district)))
+
+# Construct final data based on interest of analysis:: 
+  # Select Primary Type of interest and create categorical variable:
+      # Homicide
+      # Human Trafficking 
+      # Kidnapping
+      # Narcotics
+
+data = 
+  crimes %>%
+  filter(
+    primary.type %in% 
+      c("HOMICIDE", 
+      "HUMAN TRAFFICKING", 
+      "KIDNAPPING", 
+      "PROSTITUTION")
+  ) %>%
+  mutate(
+    crime_type =
+      ifelse(primary.type == "HOMICIDE", 1, 
+      ifelse(primary.type == "HUMAN TRAFFICKING", 2,
+      ifelse(primary.type == "KIDNAPPING", 3, 4)))
+  )
+```
+
 
 
 
