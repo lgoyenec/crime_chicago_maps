@@ -94,6 +94,28 @@ data =
 
 
 ## Maps  {.tabset .tabset-fade}
+### Map 0: 
+#### Basemap 
+```{r}
+leaflet() %>%
+  addTiles() %>%
+  
+  addProviderTiles(provider = "Esri.WorldGrayCanvas", group = "World Gray") %>%
+  addTiles(group = "OSM (default)") %>%
+  addProviderTiles("CartoDB.DarkMatterNoLabels"     , group = "World Dark") %>% 
+  addProviderTiles(provider = "Esri.WorldStreetMap" , group = "World StreetMap") %>%
+  addProviderTiles(provider = "Esri.WorldImagery"   , group = "World Imagery") %>%
+  
+  addPolygons(data = sh_bound, 
+              color = "white", weight = 1, 
+              fillColor = "black", fillOpacity = 0.2) %>%
+  
+  addLayersControl(
+    baseGroups = c("World Gray","OSM (default)","World Dark","World StreetMap","World Imagery"),
+    options = layersControlOptions(collapsed = F),
+    position = "bottomright") 
+```
+
 ### Map 1:
 #### Distribution of total crimes in 2018 across police beats
 ```{r}
