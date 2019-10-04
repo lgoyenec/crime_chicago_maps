@@ -93,6 +93,49 @@ data =
 ```
 
 
+## Maps  {.tabset .tabset-fade}
+### Map 1:
+#### Distribution of total crimes in 2018 across police beats
+```{r}
+# Count number of crimes per beat
+data_beats = 
+  data %>%
+  group_by(beat) %>% 
+  dplyr::summarise(n = n()) %>%
+  dplyr::rename(beat_num = beat)
+
+# Merge data_beats with shaapefile
+map_beats       = sh_bound
+map_beats@data  = merge(map_beats@data, data_beats, id = "beat_num")
+
+# Generate the bins for the graph
+dom    = map_beats$n
+bin    = quantile(dom, na.rm = T)
+bin[1] = 0
+pal    = colorBin("Reds", domain = dom, bins = bin, na.color = "#FFFDFC")
+
+# Map with pop ups
+leaflet(map_beats) %>%
+  
+  addTiles(group = "OSM (default)") %>%
+  
+  addProviderTiles("CartoDB.DarkMatterNoLabels"    , group = "World Dark") %>% 
+  addProviderTiles(provider = "Esri.WorldStreetMap", group = "World StreetMap") %>%
+  addProviderTiles(provider = "Esri.WorldImagery"  , group = "World Imagery") %>%
+  
+  addPolygons(
+    fillColor =~ pal(dom), fillOpacity = 0.8,
+    color = "white", weight = 0.3, 
+    stroke = T, smoothFactor = 0.2,
+    popup = paste("Number of crimes:", map_beats$n)) %>%
+  
+  addLayersControl(
+    baseGroups = c("OSM (default)","World Dark","World StreetMap","World Imagery"),
+    options = layersControlOptions(collapsed = F),
+    position = "bottomright") 
+```
+
+
 
 
 
