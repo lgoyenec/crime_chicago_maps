@@ -54,6 +54,8 @@ names(crimes) = tolower(names(crimes))
 names(police) = tolower(names(police))
 
 # Choosing variables of interest
+# Crime: 
+  # Select longitud, latitud, type of crime and other geo categories
 crimes = 
   crimes %>% 
   select(date, 
@@ -63,6 +65,8 @@ crimes =
          beat, district, ward, community.area, 
          x.coordinate, y.coordinate, latitude, longitude) 
 
+# Police:
+  # Select longitud, latitud, and other geo categories
 police = 
   police %>%
   select(`ï..district`, district.name, 
@@ -109,11 +113,12 @@ data_beats =
   dplyr::summarise(n = n()) %>%
   dplyr::rename(beat_num = beat)
 
-# Merge data_beats with shaapefile
+# Merge data_beats with shapefile by police beats
 map_beats       = sh_bound
 map_beats@data  = merge(map_beats@data, data_beats, id = "beat_num")
 
 # Generate the bins for the graph
+# Calculate the quantile of number of crimes across police beats
 dom    = map_beats$n
 bin    = quantile(dom, na.rm = T)
 bin[1] = 0
@@ -122,18 +127,21 @@ pal    = colorBin("Reds", domain = dom, bins = bin, na.color = "#FFFDFC")
 # Map with pop ups
 leaflet(map_beats) %>%
   
+  # Add base maps
   addTiles(group = "OSM (default)") %>%
-  
   addProviderTiles("CartoDB.DarkMatterNoLabels"    , group = "World Dark") %>% 
   addProviderTiles(provider = "Esri.WorldStreetMap", group = "World StreetMap") %>%
   addProviderTiles(provider = "Esri.WorldImagery"  , group = "World Imagery") %>%
   
+  # Add polygons:
+    # Each polygon is classified by the number of crimes per police beat in Chicago
   addPolygons(
     fillColor =~ pal(dom), fillOpacity = 0.8,
     color = "white", weight = 0.3, 
     stroke = T, smoothFactor = 0.2,
     popup = paste("Number of crimes:", map_beats$n)) %>%
   
+  # Add Layer Control for all the basemaps 
   addLayersControl(
     baseGroups = c("OSM (default)","World Dark","World StreetMap","World Imagery"),
     options = layersControlOptions(collapsed = F),
@@ -148,28 +156,34 @@ pal = colorFactor(c("#3C153B","#F46036","#1B998B","#0079AD"), unique(data$crime_
 
 # Map for 4 different crimes
 leaflet() %>%
-  addTiles() %>%
   
+  # Add base maps
+  addTiles() %>%
   addProviderTiles(provider = "Esri.WorldGrayCanvas", group = "World Gray") %>%
   addTiles(group = "OSM (default)") %>%
   addProviderTiles("CartoDB.DarkMatterNoLabels"     , group = "World Dark") %>% 
   addProviderTiles(provider = "Esri.WorldStreetMap" , group = "World StreetMap") %>%
   addProviderTiles(provider = "Esri.WorldImagery"   , group = "World Imagery") %>%
   
+  # Add polygons of police beats
   addPolygons(data = sh_bound, 
               color = "white", weight = 1, 
               fillColor = "black", fillOpacity = 0.2) %>%
   
+  # Crimes Markers by primary type
+  # After selecting the 4 specific primary types of crimes, we locate them and color
   addCircleMarkers(data = data,
                    lng =~ longitude, lat =~ latitude, 
                    color =~ pal(crime_type), fillOpacity = 1, 
                    radius = 1, stroke = T) %>%
   
+  # Legend by crime type
   addLegend(title  = "", 
             colors = c("#3C153B", "#F46036", "#1B998B", "#0079AD"), 
             labels = c("Homicide", "Human Trafficking", "Kidnapping", "Prostitution"),
             opacity = 1) %>%
   
+  # Add Layer Control for all the basemaps 
   addLayersControl(
     baseGroups = c("World Gray","OSM (default)","World Dark","World StreetMap","World Imagery"),
     options = layersControlOptions(collapsed = F),
@@ -177,8 +191,9 @@ leaflet() %>%
 ```
 
 ### Map 3
-#### Distance between police stations and kidnapping crimes
+#### Distance between police stations and assault crimes
 ```{r, messages = F, warnings = F}
+# Select assaults that ended up in an arrest
 data_kidna =
   crimes %>%
   filter(primary.type == "ASSAULT", arrest == "true") %>%
@@ -186,38 +201,49 @@ data_kidna =
 
 leaflet() %>%
   
+  # Add base maps
   addProviderTiles(provider = "Esri.WorldGrayCanvas", group = "World Gray") %>%
   addTiles(group = "OSM (default)") %>%
   addProviderTiles("CartoDB.DarkMatterNoLabels"     , group = "World Dark") %>% 
   addProviderTiles(provider = "Esri.WorldStreetMap" , group = "World StreetMap") %>%
   addProviderTiles(provider = "Esri.WorldImagery"   , group = "World Imagery") %>%
   
+  # Add polygons of police beats
   addPolygons(data = sh_bound, 
               color = "white", weight = 1, 
               fillColor = "#202030", fillOpacity = 0.6) %>%
   
+  # Bike routes across Chicago
   addPolylines(data = sh_bikes, 
                color = "#F5BB00",
                weight = 1.5,
                group = "Bike Routes") %>%
-
+  
+  # Crimes Markers: points where assault crimes happened
   addCircleMarkers(data = data_kidna,
                    lng =~ longitude, lat =~ latitude,
                    color = "#BA1200", fillOpacity = 1,
-                   radius = 0.2, stroke = F) %>%
+                   radius = 0.4, stroke = F) %>%
   
+  # Police Markers: points with radius 
   addCircleMarkers(data = police,
                    lng =~ longitude, lat =~ latitude,
-                   color = "#2A4494", fillOpacity = 0.5,
+                   color = "#2A4494", fillOpacity = 0.6,
                    radius = 15, stroke = T, weight = 1.5,
                    group = "Police Radius") %>%
   
+  # Add Layer Control for all the basemaps and 2 layers
+  # The layers corresponds to:
+    # Police stations with their specific radius
+    # Bike roads across the city
   addLayersControl(
     baseGroups = c("World Gray","OSM (default)","World Dark","World StreetMap","World Imagery"),
     overlayGroups = c("Police Radius", "Bike Routes"),
     options = layersControlOptions(collapsed = F),
     position = "bottomright") %>%
   
+  # Hide the layer: Bike Routes
+    # In this way we avoid having to much information in a single map
   hideGroup("Bike Routes")
 
 ```
