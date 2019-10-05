@@ -1,7 +1,7 @@
 ---
 title:  "Homework 02"
 author: "94-880 R Shiny <hr><b> Laura Goyeneche </b>"
-date:   "10/3/2019"
+date:   "10/04/2019"
 output:
   html_document:
      theme: cerulean
@@ -9,8 +9,14 @@ output:
      code_folding: hide
 ---
 
+<style>
+.html-widget {
+    margin: auto;
+}
+</style>
+
 ```{r setup, include = F}
-knitr::opts_chunk$set(warning = F, message = F, fig.align = "center", fig.width = 9, fig.height = 8)
+knitr::opts_chunk$set(warning = F, message = F, fig.align = "center", fig.width = 8, fig.height = 8)
 ```
 
 ```{r}
@@ -92,7 +98,7 @@ data =
   )
 ```
 
-## Maps  {.tabset .tabset-fade}
+## Maps  {.tabset .tabset-fade .tabset-pills}
 ### Map 1:
 #### Distribution of total crimes in 2018 across police beats
 ```{r}
